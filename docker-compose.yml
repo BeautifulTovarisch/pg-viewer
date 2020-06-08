@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  database:
+    image: postgres:12.3
+    environment:
+      USER_PASSWORD: "pg_viewer_password"
+      POSTGRES_PASSWORD: "dev_password"
+
+    volumes:
+      - ./db-init/example.sql:/docker-entrypoint-initdb.d/sql/example.sql
+      - ./db-init/load-data.sh:/docker-entrypoint-initdb.d/load-data.sh
+
+      - data:/var/lib/postgresql/data
+
+    networks:
+      - database
+
+  tui:
+    tty: true
+    init: true
+    build:
+      context: .
+    networks:
+      - database
+
+    volumes:
+      - ./src:/app/src/pg-viewer/src
+
+volumes:
+  data:
+
+networks:
+  database:
